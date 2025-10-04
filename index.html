@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Loan Management System</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="login-header">
+                <h2>Simple Loan Finance</h2>
+                <p>Professional Loan Management System</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="admin" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="admin" required>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full-width">Login</button>
+                <div class="login-demo-info">
+                    <small>Demo credentials: admin / admin</small>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app hidden">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="company-info">
+                    <h1>Simple Loan Finance</h1>
+                    <p>Professional Loan Management</p>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <span id="currentUser">Admin User</span>
+                        <button id="logoutBtn" class="btn btn--outline btn--sm">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="dashboard">
+                    <span>📊</span> Dashboard
+                </button>
+                <button class="nav-item" data-tab="customers">
+                    <span>👥</span> Customers
+                </button>
+                <button class="nav-item" data-tab="loans">
+                    <span>💰</span> Loans
+                </button>
+                <button class="nav-item" data-tab="payments">
+                    <span>💳</span> Payments
+                </button>
+                <button class="nav-item" data-tab="reports">
+                    <span>📈</span> Reports
+                </button>
+                <button class="nav-item" data-tab="settings">
+                    <span>⚙️</span> Settings
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="page-header">
+                    <div class="header-info">
+                        <h2>Dashboard</h2>
+                        <p class="text-secondary">Overview of your loan portfolio</p>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="btn btn--primary btn--sm" id="quickAddCustomer">
+                            <span>👤</span> Add Customer
+                        </button>
+                        <button class="btn btn--primary btn--sm" id="quickNewLoan">
+                            <span>💰</span> New Loan
+                        </button>
+                        <button class="btn btn--primary btn--sm" id="quickRecordPayment">
+                            <span>💳</span> Record Payment
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="card__body">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <h3 id="totalActiveLoans">0</h3>
+                                <p>Active Loans</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="card__body">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <h3 id="todaysCollections">₹0</h3>
+                                <p>Today's Collections</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="card__body">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-info">
+                                <h3 id="overdueCount">0</h3>
+                                <p>Overdue Loans</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="card__body">
+                            <div class="stat-icon">💵</div>
+                            <div class="stat-info">
+                                <h3 id="totalOutstanding">₹0</h3>
+                                <p>Outstanding Amount</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-row">
+                        <div class="card chart-card">
+                            <div class="card__header">
+                                <h3>Loan Distribution by Status</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="chart-container" style="position: relative; height: 300px;">
+                                    <canvas id="loanStatusChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card chart-card">
+                            <div class="card__header">
+                                <h3>Collection Efficiency</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="efficiency-display">
+                                    <div class="efficiency-circle">
+                                        <span id="efficiencyPercent">87%</span>
+                                        <small>Collection Rate</small>
+                                    </div>
+                                    <div class="efficiency-details">
+                                        <div class="efficiency-item">
+                                            <span class="label">Collected:</span>
+                                            <span id="totalCollected">₹0</span>
+                                        </div>
+                                        <div class="efficiency-item">
+                                            <span class="label">Expected:</span>
+                                            <span id="totalExpected">₹0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-tables">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Top Customers by Loan Amount</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Total Loans</th>
+                                            <th>Total Amount</th>
+                                            <th>Outstanding</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="topCustomers">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Recent Payments</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="table-container">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Customer</th>
+                                            <th>Amount</th>
+                                            <th>Mode</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentPayments">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue Alerts -->
+                <div id="overdueAlerts" class="card alert-card hidden">
+                    <div class="card__header">
+                        <h3>⚠️ Payment Reminders</h3>
+                    </div>
+                    <div class="card__body">
+                        <div id="overdueList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Tab -->
+            <div id="customers" class="tab-content">
+                <div class="page-header">
+                    <div class="header-info">
+                        <h2>Customer Management</h2>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn--outline" id="exportCustomersBtn">Export CSV</button>
+                        <button class="btn btn--primary" id="addCustomerBtn">Add Customer</button>
+                    </div>
+                </div>
+                
+                <div class="filters-section">
+                    <div class="search-filters">
+                        <div class="search-bar">
+                            <input type="text" id="customerSearch" class="form-control" placeholder="Search customers by name, phone, or address...">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="customerStatusFilter" class="form-control">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Photo</th>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Occupation</th>
+                                        <th>Monthly Income</th>
+                                        <th>Total Loans</th>
+                                        <th>Outstanding</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loans Tab -->
+            <div id="loans" class="tab-content">
+                <div class="page-header">
+                    <div class="header-info">
+                        <h2>Loan Management</h2>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn--outline" id="loanCalculatorBtn">Calculator</button>
+                        <button class="btn btn--primary" id="addLoanBtn">Create Loan</button>
+                    </div>
+                </div>
+                
+                <div class="filters-section">
+                    <div class="search-filters">
+                        <div class="search-bar">
+                            <input type="text" id="loanSearch" class="form-control" placeholder="Search loans by customer name, loan ID, or purpose...">
+                        </div>
+                        <div class="filter-controls">
+                            <select id="loanStatusFilter" class="form-control">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="closed">Closed</option>
+                                <option value="overdue">Overdue</option>
+                            </select>
+                            <select id="loanPurposeFilter" class="form-control">
+                                <option value="">All Purposes</option>
+                                <option value="Business Expansion">Business Expansion</option>
+                                <option value="Medical Emergency">Medical Emergency</option>
+                                <option value="Property Purchase">Property Purchase</option>
+                                <option value="Home Renovation">Home Renovation</option>
+                                <option value="Vehicle Purchase">Vehicle Purchase</option>
+                                <option value="Working Capital">Working Capital</option>
+                                <option value="Education">Education</option>
+                                <option value="Equipment Purchase">Equipment Purchase</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Loan ID</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Rate</th>
+                                        <th>Duration</th>
+                                        <th>Purpose</th>
+                                        <th>Guarantor</th>
+                                        <th>Outstanding</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="loansTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="payments" class="tab-content">
+                <div class="page-header">
+                    <div class="header-info">
+                        <h2>Payment Management</h2>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn--outline" id="paymentScheduleBtn">Payment Schedule</button>
+                        <button class="btn btn--primary" id="recordPaymentBtn">Record Payment</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card__body">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Receipt No</th>
+                                        <th>Date</th>
+                                        <th>Customer</th>
+                                        <th>Loan ID</th>
+                                        <th>Amount</th>
+                                        <th>Late Fee</th>
+                                        <th>Mode</th>
+                                        <th>Balance After</th>
+                                        <th>Cashier</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentsTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <div class="page-header">
+                    <div class="header-info">
+                        <h2>Reports & Analytics</h2>
+                    </div>
+                </div>
+                
+                <div class="reports-grid">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Daily Collection Report</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="form-group">
+                                <label class="form-label" for="reportDate">Select Date</label>
+                                <input type="date" id="reportDate" class="form-control">
+                            </div>
+                            <button class="btn btn--primary" id="generateDailyReport">Generate Report</button>
+                            <div id="dailyReportResult" class="report-result"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Aging Analysis</h3>
+                        </div>
+                        <div class="card__body">
+                            <button class="btn btn--primary" id="generateAgingReport">Generate Report</button>
+                            <div id="agingReportResult" class="report-result"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Monthly Collection Trend</h3>
+                        </div>
+                        <div class="card__body">
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="monthlyTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Loan Performance by Officer</h3>
+                        </div>
+                        <div class="card__body">
+                            <button class="btn btn--primary" id="generateOfficerReport">Generate Report</button>
+                            <div id="officerReportResult" class="report-result"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="page-header">
+                    <div class="header-info">
+                        <h2>Settings & Configuration</h2>
+                    </div>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Company Profile</h3>
+                        </div>
+                        <div class="card__body">
+                            <form id="companyForm">
+                                <div class="form-group">
+                                    <label class="form-label">Company Name</label>
+                                    <input type="text" id="companyName" class="form-control" value="Simple Loan Finance">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Address</label>
+                                    <textarea id="companyAddress" class="form-control" rows="3">123 Finance Street, Hyderabad - 500001</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Phone</label>
+                                    <input type="text" id="companyPhone" class="form-control" value="040-12345678">
+                                </div>
+                                <button type="submit" class="btn btn--primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Interest Rate Templates</h3>
+                        </div>
+                        <div class="card__body">
+                            <div id="rateTemplates">
+                                <div class="rate-template">
+                                    <span>Personal Loan: 2.5%</span>
+                                    <button class="btn btn--sm btn--outline">Edit</button>
+                                </div>
+                                <div class="rate-template">
+                                    <span>Business Loan: 2.0%</span>
+                                    <button class="btn btn--sm btn--outline">Edit</button>
+                                </div>
+                                <div class="rate-template">
+                                    <span>Emergency Loan: 3.0%</span>
+                                    <button class="btn btn--sm btn--outline">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Enhanced Customer Modal -->
+    <div id="customerModal" class="modal hidden">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="customerModalTitle">Add Customer</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="customerForm" class="multi-column-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="customerName">Full Name *</label>
+                        <input type="text" id="customerName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="customerPhone">Phone Number *</label>
+                        <input type="tel" id="customerPhone" class="form-control" maxlength="10" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="customerAltPhone">Alternative Phone</label>
+                        <input type="tel" id="customerAltPhone" class="form-control" maxlength="10">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="customerOccupation">Occupation *</label>
+                        <input type="text" id="customerOccupation" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="customerIncome">Monthly Income (₹) *</label>
+                        <input type="number" id="customerIncome" class="form-control" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="customerStatus">Status</label>
+                        <select id="customerStatus" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="customerAddress">Address *</label>
+                    <textarea id="customerAddress" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="customerNotes">Notes/Remarks</label>
+                    <textarea id="customerNotes" class="form-control" rows="2" placeholder="Additional information about the customer"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn--secondary modal-cancel">Cancel</button>
+                    <button type="submit" class="btn btn--primary">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enhanced Loan Modal -->
+    <div id="loanModal" class="modal hidden">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>Create New Loan</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="loanForm" class="multi-column-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="loanCustomer">Customer *</label>
+                        <select id="loanCustomer" class="form-control" required>
+                            <option value="">Select Customer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="loanPurpose">Loan Purpose *</label>
+                        <select id="loanPurpose" class="form-control" required>
+                            <option value="">Select Purpose</option>
+                            <option value="Business Expansion">Business Expansion</option>
+                            <option value="Medical Emergency">Medical Emergency</option>
+                            <option value="Property Purchase">Property Purchase</option>
+                            <option value="Home Renovation">Home Renovation</option>
+                            <option value="Vehicle Purchase">Vehicle Purchase</option>
+                            <option value="Working Capital">Working Capital</option>
+                            <option value="Education">Education</option>
+                            <option value="Equipment Purchase">Equipment Purchase</option>
+                            <option value="Personal">Personal</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="loanAmount">Loan Amount (₹) *</label>
+                        <input type="number" id="loanAmount" class="form-control" min="5000" max="500000" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="loanRate">Interest Rate (% per month) *</label>
+                        <select id="loanRate" class="form-control" required>
+                            <option value="1.8">1.8% - Home Loan</option>
+                            <option value="2.0">2.0% - Business Loan</option>
+                            <option value="2.2">2.2% - Vehicle Loan</option>
+                            <option value="2.5" selected>2.5% - Personal Loan</option>
+                            <option value="3.0">3.0% - Emergency Loan</option>
+                            <option value="3.5">3.5% - Others</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="loanDuration">Duration (months) *</label>
+                        <input type="number" id="loanDuration" class="form-control" min="1" max="60" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="loanStartDate">Start Date *</label>
+                        <input type="date" id="loanStartDate" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="loanGuarantor">Guarantor *</label>
+                    <select id="loanGuarantor" class="form-control" required>
+                        <option value="">Select Guarantor</option>
+                    </select>
+                </div>
+                <div class="loan-calculation">
+                    <div class="calculation-result">
+                        <p><strong>Monthly Installment: ₹<span id="monthlyInstallment">0</span></strong></p>
+                        <p>Total Amount Payable: ₹<span id="totalAmount">0</span></p>
+                        <p>Total Interest: ₹<span id="totalInterest">0</span></p>
+                    </div>
+                </div>
+                <div class="documents-checklist">
+                    <h4>Document Checklist</h4>
+                    <div class="checklist-items">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="docIdProof">
+                            <span>ID Proof (Aadhar/PAN/Passport)</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="docAddressProof">
+                            <span>Address Proof (Utility Bill/Rent Agreement)</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="docIncomeProof">
+                            <span>Income Proof (Salary Slip/ITR/Bank Statement)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn--secondary modal-cancel">Cancel</button>
+                    <button type="submit" class="btn btn--primary">Create Loan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enhanced Payment Modal -->
+    <div id="paymentModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Record Payment</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label class="form-label" for="paymentLoan">Select Loan *</label>
+                    <select id="paymentLoan" class="form-control" required>
+                        <option value="">Select Loan</option>
+                    </select>
+                </div>
+                <div class="payment-info hidden" id="paymentInfo">
+                    <div class="info-row">
+                        <span>Outstanding Balance:</span>
+                        <span id="outstandingBalance">₹0</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Regular EMI:</span>
+                        <span id="regularEMI">₹0</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Due Date:</span>
+                        <span id="nextDueDate">-</span>
+                    </div>
+                    <div class="info-row overdue" id="overdueInfo">
+                        <span>Days Overdue:</span>
+                        <span id="daysOverdue">0</span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="paymentAmount">Payment Amount (₹) *</label>
+                        <input type="number" id="paymentAmount" class="form-control" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="lateFeeAmount">Late Fee (₹)</label>
+                        <input type="number" id="lateFeeAmount" class="form-control" min="0" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="paymentDate">Payment Date *</label>
+                        <input type="date" id="paymentDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="paymentMode">Payment Mode *</label>
+                        <select id="paymentMode" class="form-control" required>
+                            <option value="">Select Mode</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Cheque">Cheque</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="paymentNotes">Notes</label>
+                    <input type="text" id="paymentNotes" class="form-control" placeholder="Payment reference or notes">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn--secondary modal-cancel">Cancel</button>
+                    <button type="submit" class="btn btn--primary">Record Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customer Details Modal -->
+    <div id="customerDetailsModal" class="modal hidden">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3 id="customerDetailsTitle">Customer Details</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="customer-details-content">
+                <div id="customerDetailsBody"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn--secondary modal-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Schedule Modal -->
+    <div id="scheduleModal" class="modal hidden">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>Payment Schedule</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="schedule-content">
+                <div id="scheduleBody"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn--secondary modal-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receiptModal" class="modal hidden">
+        <div class="modal-content receipt-modal">
+            <div class="modal-header">
+                <h3>Payment Receipt</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="receipt-content">
+                <div class="receipt-header">
+                    <h2>Simple Loan Finance</h2>
+                    <p>123 Finance Street, Hyderabad - 500001</p>
+                    <p>Phone: 040-12345678</p>
+                    <hr>
+                    <h3>Payment Receipt</h3>
+                </div>
+                <div id="receiptDetails"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn--secondary modal-cancel">Close</button>
+                <button type="button" class="btn btn--primary" id="printReceipt">Print Receipt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Calculator Modal -->
+    <div id="calculatorModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Loan Calculator</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="calculator-content">
+                <div class="form-group">
+                    <label class="form-label">Principal Amount (₹)</label>
+                    <input type="number" id="calcAmount" class="form-control" min="5000" value="50000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Interest Rate (% per month)</label>
+                    <input type="number" id="calcRate" class="form-control" min="0.5" max="10" step="0.1" value="2.5">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duration (months)</label>
+                    <input type="number" id="calcDuration" class="form-control" min="1" max="60" value="12">
+                </div>
+                <div class="calculator-results">
+                    <div class="result-item">
+                        <span>Monthly EMI:</span>
+                        <span id="calcEMI">₹0</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Total Interest:</span>
+                        <span id="calcInterest">₹0</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Total Payable:</span>
+                        <span id="calcTotal">₹0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn--secondary modal-cancel">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

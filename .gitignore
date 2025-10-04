@@ -1,0 +1,7 @@
+﻿# Common ignores for webapps
+node_modules/
+dist/
+build/
+.env
+.DS_Store
+Thumbs.db
