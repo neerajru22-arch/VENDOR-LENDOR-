@@ -1,0 +1,11 @@
+﻿services:
+  - type: web
+    name: vendor-lendor
+    env: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20.x"
