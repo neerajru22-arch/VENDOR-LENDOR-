@@ -15,7 +15,9 @@ let loans = [];
 let payments = [];
 
 // --- API: health ---
-app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString() });
+});
 
 // --- API: customers ---
 app.get('/api/customers', (req, res) => res.json(customers));
@@ -44,11 +46,11 @@ app.post('/api/payments', (req, res) => {
 // --- Serve static UI ---
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Single-page fallback (if needed)
-app.get('*', (req, res) => {
+// Final catch-all middleware for SPA (no wildcard pattern)
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
-  console.log(\Server running on port \\);
+  console.log(`Server running on port ${PORT}`);
 });
